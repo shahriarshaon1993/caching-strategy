@@ -2,7 +2,7 @@
 
 ### Overview
 
-This is a basic real-time notification system built with Laravel 12 and Blade templates. The application simulates broadcasting notifications when a new user registers, using Laravel's broadcasting features without requiring a full WebSocket server
+This Laravel 12 application demonstrates the implementation of caching strategies to optimize product data retrieval. It compares three approaches: no caching, file-based caching, and Redis caching, showcasing performance improvements for a large product dataset.
 
 ### Features
 
