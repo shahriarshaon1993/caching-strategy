@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Requests\UserRegisterRequest;
-use App\Models\Role;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
-class RegisteredUserController
+class RegisteredUserController extends Controller
 {
     /**
-     * Show the registration form.
-     *
-     * @return View
+     * Display the registration view.
      */
     public function create(): View
     {
@@ -24,27 +25,26 @@ class RegisteredUserController
     /**
      * Handle an incoming registration request.
      *
-     * @param  UserRegisterRequest  $request
-     * @return RedirectResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(UserRegisterRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        // Get the validated attributes from the request
-        $attributes = $request->validated();
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
 
-        // Retrieve the 'customer' role from the roles table
-        $role = Role::query()->where('name', 'customer')->first();
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-        // Create a new user with the validated attributes
-        $user = User::query()->create($attributes);
+        event(new Registered($user));
 
-        // Assign the 'customer' role to the newly created user
-        $user->roles()->attach($role->id);
-
-        // Log the user in
         Auth::login($user);
 
-        // Redirect to the home route with a success flash message
-        return redirect()->route('home')->with('success', 'Registration successful!');
+        return redirect(route('dashboard', absolute: false));
     }
 }
