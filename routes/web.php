@@ -18,7 +18,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('put-cache', function () {
-        Cache::put('TEST', 'Hello World 2', 60);
+        Cache::store('file')->put('MYKEY', 'Hello Shaon, How are you today', 60);
+        Cache::store('redis')->put('MYKEY', 'Hello Shaon, How are you today', 60);
+        Cache::store('database')->put('MYKEY', 'Hello Shaon, How are you today', 60);
 
         return back();
     });
