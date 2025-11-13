@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('put-cache', function () {
         Cache::store('file')->put('MYKEY', 'Hello Shaon, How are you today', 60);
-        Cache::store('redis')->put('MYKEY', 'Hello Shaon, How are you today', 60);
+        Cache::store('redis')->put('EKT', 'Hello Shaon, How are you today', 60);
         Cache::store('database')->put('MYKEY', 'Hello Shaon, How are you today', 60);
 
         return back();
@@ -30,6 +31,9 @@ Route::middleware('auth')->group(function () {
 
         return response()->json($data);
     });
+
+    Route::resource('posts', PostController::class);
+    Route::get('clears', [PostController::class, 'clears'])->name('clears');
 });
 
 require __DIR__ . '/auth.php';
